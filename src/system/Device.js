@@ -824,7 +824,9 @@ FORGE.Device = (function(c)
         this._checkGyroscope();
         this._checkScreen();
 
-        //lock Device object
+        // _checkComplete is initially called by either _deviceMotionHandler or
+        // _deviceOrientationHandler, but if both deviceMotion and deviceOrientation are set to
+        // false, we need to force the call of _checkComplete
         if (this.deviceMotion === false && this.deviceOrientation === false)
         {
             this._checkComplete();
@@ -847,10 +849,9 @@ FORGE.Device = (function(c)
             this._removeDeviceOrientationHandler();
         }
 
-        if (this.deviceMotionRotationRate === true && this.deviceMotionAcceleration === true && this.deviceOrientationMagnetometer === true)
-        {
-            this.gyroscope = true;
-        }
+        this.gyroscope = (this.deviceMotionRotationRate === true
+                            && this.deviceMotionAcceleration === true
+                            && this.deviceOrientationMagnetometer === true);
 
         this.ready = true;
 
@@ -971,7 +972,7 @@ FORGE.Device = (function(c)
         {
             if(typeof this[i] === "undefined")
             {
-                this.warn("Unable to check plugin device compatibility for: "+i);
+                console.warn("Unable to check plugin device compatibility for: "+i);
             }
             else if(this[i] !== config[i])
             {
